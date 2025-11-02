@@ -5,6 +5,8 @@ class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
     username = Column(VARCHAR(50), nullable=False)
+    first_name = Column(VARCHAR(50), nullable=True)
+    last_name = Column(VARCHAR(50), nullable=True)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
 
