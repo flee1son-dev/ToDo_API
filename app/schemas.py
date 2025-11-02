@@ -1,9 +1,11 @@
 from pydantic import BaseModel, Field
 
 class UserBase(BaseModel):
-    username: str
-    password: str
-    email: str
+    username: str = Field(..., description="User's username")
+    password: str = Field(..., description="User's password")
+    email: str = Field(..., description="User's email")
+    first_name: str = Field(None, description="User's first name")
+    last_name: str = Field(None, description="User's last name")
 
 
 class TaskBase(BaseModel):
