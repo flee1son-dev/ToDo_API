@@ -24,6 +24,9 @@ class UserResponse(UserBase):
 class UserCreate(UserBase):
     pass
 
+class UserLogin(UserBase):
+    pass
+
 class UserUpdate(UserBase):
     email: str | None
     username: str | None
@@ -49,6 +52,12 @@ class TaskUpdate(TaskBase):
 
 class TaskDelete(TaskBase):
     pass
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "Bearer"
+
+
 
 
 

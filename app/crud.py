@@ -3,13 +3,21 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from . import models, schemas
 from database import get_db
+from .utils.hashing import hash_password, verify_password
 
-def create_user(db: Session, user: schemas.UserCreate):
-    db_user = models.User(**user.dict())
-    db.add(db_user)
+def create_user(db: Session, username: str, password:str, email: str):
+    hashed_pwd = hash_password(password)
+    new_user = models.User(username=username, email=email, password= hashed_pwd)
+    db.add(new_user)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(new_user)
+    return new_user
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user or not verify_password(password, user.password):
+        return None
+    return user
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()

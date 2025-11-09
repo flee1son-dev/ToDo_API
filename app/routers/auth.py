@@ -1,0 +1,30 @@
+from fastapi import Depends, HTTPException, status, APIRouter
+from sqlalchemy.orm import Session
+from app import schemas, crud, models
+from app.database import get_db
+from app.utils.token import create_access_token
+
+router = APIRouter(
+    prefix="/auth",
+    tags=["Auth"],
+)
+
+
+@router.post("register", status_code=status.HTTP_201_CREATED, response_model=schemas.UserCreate)
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    return crud.create_user(db, user.username, user.password)
+
+@router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    db_user = crud.authenticate_user(db, username=user.username, password=user.password)
+    if not db_user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+
+
