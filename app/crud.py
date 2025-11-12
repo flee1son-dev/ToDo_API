@@ -91,7 +91,10 @@ def update_task(
     return db_task
 
 def delete_task(task_id: int, current_user: models.User = Depends(token.get_current_user), db: Session(get_db),):
-    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    db_task = db.query(models.Task).filter(
+        models.Task.id == task_id,
+        models.Task.owner_id == current_user.id
+    ).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
     db.delete(db_task)
