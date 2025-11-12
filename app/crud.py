@@ -1,9 +1,9 @@
-from fastapi import HTTPException
-
+from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 from . import models, schemas
 from database import get_db
 from .utils.hashing import hash_password, verify_password
+from app.utils import token
 
 def create_user(db: Session, username: str, password:str, email: str):
     hashed_pwd = hash_password(password)
@@ -49,24 +49,38 @@ def delete_user(db: Session, user_id: int):
     return db_user
 
 
-def create_task(db: Session, task: schemas.TaskCreate):
-    db_task = models.Task(**task.dict())
+def create_task(title: str, current_user: models.User = Depends(token.get_current_user), db: Session = Depends(get_db)):
+    db_task = models.Task(title=title, owner_id=current_user.id)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
     return db_task
 
-def get_tasks(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Task).offset(skip).limit(limit).all()
+def get_tasks(
+        current_user: models.User = Depends(token.get_current_user),
+        db: Session = Depends(get_db),
+        skip: int = 0,
+        limit: int = 100
+):
+    return db.query(models.Task).filter(models.Task.owner_id == current_user.id).offset(skip).limit(limit).all()
 
-def get_task_by_id(db: Session, task_id: int):
-    return db.query(models.Task).filter(models.Task.id == task_id).first()
+def get_task_by_title( task_title: int, db: Session, current_user: models.User = Depends(token.get_current_user)):
+    return db.query(models.Task).filter(
+        models.Task.owner_id == current_user.id,
+        models.Task.title == task_title
+    ).first()
 
-def get_task_by_user(db: Session, user_id: int):
-    return db.query(models.Task).filter(models.User.id == user_id).all()
-
-def update_task(db: Session, task_id: int, task_update: schemas.TaskUpdate):
-    db_task = db.query(models.Task).filter(models.Task.id == task.id).first()
+def update_task(
+        task_id: int,
+        title: str,
+        db: Session,
+        task_update: schemas.TaskUpdate,
+        current_user: models.User = Depends(token.get_current_user),
+):
+    db_task = db.query(models.Task).filter(
+        models.Task.id == task_id,
+        models.Task.owner_id == current_user.id
+        ).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
     update_data = task_update.dict(exclude_unset=True)
@@ -76,7 +90,7 @@ def update_task(db: Session, task_id: int, task_update: schemas.TaskUpdate):
     db.refresh(db_task)
     return db_task
 
-def delete_task(db: Session, task_id: int):
+def delete_task(task_id: int, current_user: models.User = Depends(token.get_current_user), db: Session(get_db),):
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
