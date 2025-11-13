@@ -1,9 +1,9 @@
 from  fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from models import User, Task
-from database import engine, SessionLocal, Base
-from crud import *
+from app.models import User, Task
+from app.database import engine, SessionLocal, Base
+from app.crud import *
 from app.routers import users, tasks
 
 app = FastAPI()
@@ -30,3 +30,4 @@ def read_root():
             "tasks": "/tasks",
         }
     }
+

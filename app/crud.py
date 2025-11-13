@@ -1,8 +1,8 @@
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 from . import models, schemas
-from database import get_db
-from .utils.hashing import hash_password, verify_password
+from app.database import get_db
+from app.utils.hashing import hash_password, verify_password
 from app.utils import token
 
 def create_user(db: Session, username: str, password:str, email: str):
@@ -49,7 +49,7 @@ def delete_user(db: Session, user_id: int):
     return db_user
 
 
-def create_task(title: str, current_user: models.User = Depends(token.get_current_user), db: Session = Depends(get_db)):
+def create_task(title: str, db: Session, current_user: models.User = Depends(token.get_current_user)):
     db_task = models.Task(title=title, owner_id=current_user.id)
     db.add(db_task)
     db.commit()
@@ -57,8 +57,8 @@ def create_task(title: str, current_user: models.User = Depends(token.get_curren
     return db_task
 
 def get_tasks(
+        db: Session,
         current_user: models.User = Depends(token.get_current_user),
-        db: Session = Depends(get_db),
         skip: int = 0,
         limit: int = 100
 ):
@@ -71,14 +71,13 @@ def get_task_by_title( task_title: int, db: Session, current_user: models.User =
     ).first()
 
 def update_task(
-        task_id: int,
-        title: str,
+        task_title: str,
         db: Session,
         task_update: schemas.TaskUpdate,
         current_user: models.User = Depends(token.get_current_user),
 ):
     db_task = db.query(models.Task).filter(
-        models.Task.id == task_id,
+        models.Task.title == task_title,
         models.Task.owner_id == current_user.id
         ).first()
     if not db_task:
@@ -90,7 +89,7 @@ def update_task(
     db.refresh(db_task)
     return db_task
 
-def delete_task(task_id: int, current_user: models.User = Depends(token.get_current_user), db: Session(get_db),):
+def delete_task(task_id: int, db: Session, current_user: models.User = Depends(token.get_current_user), ):
     db_task = db.query(models.Task).filter(
         models.Task.id == task_id,
         models.Task.owner_id == current_user.id

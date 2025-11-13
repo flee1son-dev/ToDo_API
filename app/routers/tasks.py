@@ -43,7 +43,7 @@ def update_task(task_id: int, db: Session = Depends(get_db)):
 
 
 #DELETE
-@router.delete("/{task_id}", response_model=schemas.TaskResponse, status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     db_task = crud.get_task_by_id(db=db, task_id=task_id)
     if not db_task:
