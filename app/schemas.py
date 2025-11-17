@@ -46,9 +46,10 @@ class TaskCreate(TaskBase):
     pass
 
 class TaskUpdate(TaskBase):
-    title: str | None
-    description: str | None
-    completed: bool
+    title: str | None = None
+    description: str | None = None
+    completed: bool | None = None
+
 
 class TaskDelete(TaskBase):
     pass

@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Depends, status, APIRouter
-from app import schemas, models, crud
+from app import schemas, crud
 from app.database import get_db
 
 from sqlalchemy.orm import Session
@@ -8,12 +8,6 @@ router = APIRouter(
     prefix="/users",
     tags=["users"]
 )
-
-
-#CREATE
-@router.post("/",response_model=schemas.UserCreate, status_code=status.HTTP_201_CREATED)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db, user)
 
 
 #READ ALL
@@ -46,5 +40,5 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.delete_user(db=db, user_id=user_id)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"message": f"User {user_id} deleted"}
+    return None
 
