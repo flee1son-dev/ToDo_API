@@ -1,6 +1,8 @@
 from  fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from starlette.staticfiles import StaticFiles
+
 from app.database import engine, SessionLocal, Base
 from app.routers import users, auth, tasks
 
@@ -21,13 +23,13 @@ app.include_router(auth.router)
 Base.metadata.create_all(engine)
 
 
-@app.get("/")
-def read_root():
+@app.get("/health")
+def health():
     return {
-        "message": "To-Do-API running",
-        "endpoint": {
-            "users": "/users",
-            "tasks": "/tasks",
-        }
+        "status": "ok"
     }
+
+
+app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
+
 

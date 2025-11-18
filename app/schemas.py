@@ -21,13 +21,14 @@ class UserResponse(UserBase):
     class Config:
         orm_mode = True
 
-class UserCreate(UserBase):
+class UserCreate(UserResponse):
     pass
 
-class UserLogin(UserBase):
+class UserLogin(UserResponse):
+    access_token: str
     pass
 
-class UserUpdate(UserBase):
+class UserUpdate(UserResponse):
     email: str | None
     username: str | None
     password: str | None
