@@ -30,6 +30,6 @@ def health():
     }
 
 
-app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
+app.mount("/app", StaticFiles(directory="frontend/dist", html=True), name="frontend")
 
 

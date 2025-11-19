@@ -1,1 +1,18 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PrimaryKeyConstraint, UniqueConstraint, VARCHARfrom app.database import Baseclass User(Base):    __tablename__ = "user"    id = Column(Integer, primary_key=True)    username = Column(VARCHAR(50), nullable=False)    first_name = Column(VARCHAR(50), nullable=True)    last_name = Column(VARCHAR(50), nullable=True)    email = Column(String, unique=True, nullable=False)    password = Column(String, nullable=False)class Task(Base):    __tablename__ = "task"    id = Column(Integer, primary_key=True)    title = Column(String, nullable=False)    description = Column(String, nullable=True)    owner_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PrimaryKeyConstraint, UniqueConstraint, VARCHAR
+from app.database import Base
+
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    username = Column(VARCHAR(50), nullable=False)
+    first_name = Column(VARCHAR(50), nullable=True)
+    last_name = Column(VARCHAR(50), nullable=True)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+
+class Task(Base):
+    __tablename__ = "task"
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    owner_id = Column(Integer, ForeignKey('user.id'), nullable=False)

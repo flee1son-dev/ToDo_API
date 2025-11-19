@@ -1,3 +1,0 @@
-SECRET KEY = my_project_to_do_list_api
-ALGORITHM = HS256
-ACCES_TOKEN_EXPIRES_MINUTES=30

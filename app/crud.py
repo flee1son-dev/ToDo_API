@@ -96,7 +96,7 @@ def update_task(
     return db_task
 
 
-def delete_task(task_id: int,db: Session, current_user: models.User = Depends(token.get_current_user) ):
+def delete_task(task_id: int, db: Session, current_user: models.User = Depends(token.get_current_user) ):
     db_task = db.query(models.Task).filter(
         models.Task.id == task_id,
         models.Task.owner_id == current_user.id
