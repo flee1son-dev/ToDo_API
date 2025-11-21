@@ -22,7 +22,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         email=user.email,
         password= hashed_pwd,
         first_name=user.first_name,
-        last_name=user.last_name,
+        last_name=user.last_name
     )
     db.add(db_user)
     db.commit()
@@ -31,11 +31,12 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    print(user.username, user.password)
     db_user = crud.authenticate_user(db, username=user.username, password=user.password)
     if not db_user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(data={"sub": db_user.username})
-    return {"acces_token": access_token, "token_type": "Bearer"}
+    return {"access_token": access_token, "token_type": "Bearer"}
 
 
 

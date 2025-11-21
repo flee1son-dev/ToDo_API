@@ -31,9 +31,14 @@ export default {
         const res = await axios.post("http://127.0.0.1:8000/auth/login", {
           username: this.username,
           password: this.password
-        });
+        },
+        {
+          headers: {"Content-Type": "application/json"}
+        }
+      );
         localStorage.setItem("token", res.data.access_token);
-        alert("Успешный вход!");
+        
+        this.$router.push("/tasks")
       } catch (err) {
         alert("Ошибка входа");
       }

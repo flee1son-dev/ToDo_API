@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PrimaryKeyConstraint, UniqueConstraint, VARCHAR
+from sqlalchemy import Column, Integer, String, ForeignKey, VARCHAR, Boolean
 from app.database import Base
 
 class User(Base):
@@ -15,4 +15,5 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    completed = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey('user.id'), nullable=False)

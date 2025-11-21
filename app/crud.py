@@ -14,7 +14,11 @@ def create_user(db: Session, username: str, password:str, email: str):
 
 def authenticate_user(db: Session, username: str, password: str):
     user = db.query(models.User).filter(models.User.username == username).first()
-    if not user or not verify_password(password, user.password):
+    if not user:
+        print("Пользователь не найден")
+        return None
+    if not verify_password(plain_password=password, hashed_password=user.password):
+        print("Пароль некорректен")
         return None
     return user
 
@@ -30,7 +34,7 @@ def update_user(
         user_id: int,
         user_update: schemas.UserUpdate,
         db: Session,
-        current_user: models.User = Depends(token.get_current_user),
+        current_user: models.User,
 ):
     if current_user.id != user_id:
         raise HTTPException(status_code=401, detail="You can update only your own account")
@@ -55,8 +59,13 @@ def delete_user(db: Session, user_id: int):
     return db_user
 
 
-def create_task(title: str, db: Session, current_user: models.User = Depends(token.get_current_user)):
-    db_task = models.Task(title=title, owner_id=current_user.id)
+def create_task(task: schemas.TaskCreate, db: Session, current_user: models.User):
+    db_task = models.Task(
+        title=task.title,
+        description=task.description,
+        completed = task.completed,
+        owner_id=current_user.id
+    )
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
@@ -64,13 +73,13 @@ def create_task(title: str, db: Session, current_user: models.User = Depends(tok
 
 def get_tasks(
         db: Session,
-        current_user: models.User = Depends(token.get_current_user),
+        current_user: models.User,
         skip: int = 0,
         limit: int = 100
 ):
     return db.query(models.Task).filter(models.Task.owner_id == current_user.id).offset(skip).limit(limit).all()
 
-def get_task_by_title( task_title: int, db: Session, current_user: models.User = Depends(token.get_current_user)):
+def get_task_by_title( task_title: int, db: Session, current_user: models.User):
     return db.query(models.Task).filter(
         models.Task.owner_id == current_user.id,
         models.Task.title == task_title
@@ -80,7 +89,7 @@ def update_task(
         task_title: str,
         db: Session,
         task_update: schemas.TaskUpdate,
-        current_user: models.User = Depends(token.get_current_user),
+        current_user: models.User,
 ):
     db_task = db.query(models.Task).filter(
         models.Task.title == task_title,
@@ -96,7 +105,7 @@ def update_task(
     return db_task
 
 
-def delete_task(task_id: int, db: Session, current_user: models.User = Depends(token.get_current_user) ):
+def delete_task(task_id: int, db: Session, current_user: models.User):
     db_task = db.query(models.Task).filter(
         models.Task.id == task_id,
         models.Task.owner_id == current_user.id

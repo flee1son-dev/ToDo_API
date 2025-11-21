@@ -8,7 +8,7 @@ class UserBase(BaseModel):
 
 
 class UserResponse(UserBase):
-    user_id: int
+    id: int
 
     class Config:
         orm_mode = True
@@ -16,12 +16,11 @@ class UserResponse(UserBase):
 
 class UserCreate(UserBase):
     password: str = Field(..., description="User's password", min_length=1)
-    
-    
+  
 
 class UserLogin(BaseModel):
-    access_token: str
-    
+    username: str = Field(..., description="User's username")
+    password: str = Field(..., description="User's password")
 
 
 class UserUpdate(BaseModel):
@@ -32,9 +31,7 @@ class UserUpdate(BaseModel):
     last_name: str | None = None
     
 
-class UserLogin(BaseModel):
-    username: str = Field(..., description="User's username")
-    password: str = Field(..., description="User's password")
+
 
 
 
@@ -42,24 +39,22 @@ class TaskBase(BaseModel):
     title: str = Field(..., description="Title of the task")
     description: str = Field(None, description="Description of the task")
     completed: bool = Field(default=False, description='Status task')
-    owner_id: int = Field(..., description="User ID owner's task")
 
 
 class TaskResponse(TaskBase):
-    task_id: int = Field(..., description="Task's ID")
-    owner_id: int = Field(..., description="Owner's ID")
+    id: int = Field(..., description="Task's ID")
+    owner_id: int = Field(..., description="Owner's task ID")
 
     class Config:
         orm_mode = True
 
 
-class TaskCreate(BaseModel):
-    title: str
-    description: str | None = None
+class TaskCreate(TaskBase):
+    pass
 
 
 class TaskUpdate(BaseModel):
-    title: str = Field(..., description="Task's title", min_length=1)
+    title: str | None = None
     description: str | None = None
     completed: bool | None = None
 
