@@ -79,21 +79,21 @@ def get_tasks(
 ):
     return db.query(models.Task).filter(models.Task.owner_id == current_user.id).offset(skip).limit(limit).all()
 
-def get_task_by_title( task_title: int, db: Session, current_user: models.User):
+def get_task_by_id( task_id: int, db: Session, current_user: models.User):
     return db.query(models.Task).filter(
         models.Task.owner_id == current_user.id,
-        models.Task.title == task_title
+        models.Task.id == task_id
     ).first()
 
 def update_task(
-        task_title: str,
+        task_id: int,
         db: Session,
         task_update: schemas.TaskUpdate,
         current_user: models.User,
 ):
     db_task = db.query(models.Task).filter(
-        models.Task.title == task_title,
-        models.Task.owner_id == current_user.id
+        models.Task.id == task_id,
+        models.Task.owner_id == current_user.id 
         ).first()
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -103,6 +103,23 @@ def update_task(
     db.commit()
     db.refresh(db_task)
     return db_task
+
+# def update_task(
+#         db: Session,
+#         task_id: int,
+#         title: str | None,
+#         description: str | None,
+#         completed: bool | None
+# ):
+#     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+#     if not db_task:
+#         raise HTTPException(status_code=404, detail="Task not found")
+#     update_data = task_update.model_dump(exclude_unset=True)
+#     for key, value in update_data.items():
+#         setattr(db_task, key, value)
+#     db.commit()
+#     db.refresh(db_task)
+#     return db_task
 
 
 def delete_task(task_id: int, db: Session, current_user: models.User):
@@ -114,6 +131,6 @@ def delete_task(task_id: int, db: Session, current_user: models.User):
         raise HTTPException(status_code=404, detail="Task not found")
     db.delete(db_task)
     db.commit()
-    return db_task
+    return None
 
 

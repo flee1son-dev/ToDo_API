@@ -14,7 +14,7 @@ router = APIRouter(
 
 #CREATE
 @router.post("",response_model=schemas.TaskCreate,status_code=status.HTTP_201_CREATED)
-def create_task(
+async def create_task(
     task: schemas.TaskCreate,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -25,7 +25,7 @@ def create_task(
 
 #READ ALL
 @router.get("", response_model=list[schemas.TaskResponse])
-def read_tasks(
+async def read_tasks(
     db: Session = Depends(get_db), 
     current_user = Depends(get_current_user)
 ):
@@ -34,7 +34,7 @@ def read_tasks(
 
 #READ ONE BY ID
 @router.get('/{task_id}', response_model=schemas.TaskResponse)
-def read_one_task(
+async def read_one_task(
     task_id: int,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -46,18 +46,20 @@ def read_one_task(
 
 
 #UPDATE
-@router.put("/{task_id}", response_model=schemas.TaskUpdate)
-def update_task(
-    task: schemas.TaskUpdate, 
+@router.put("/{task_id}", response_model=schemas.TaskResponse)
+async def update_task(
+    task_id: str,
+    task_update: schemas.TaskUpdate,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    return crud.update_task(db=db, task=task, current_user=current_user)
+    
+    return  crud.update_task(task_id=task_id, db=db, task_update=task_update, current_user=current_user)
 
 
 #DELETE
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(
+async def delete_task(
     task_id: int, 
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -65,6 +67,6 @@ def delete_task(
     db_task = crud.get_task_by_id(db=db, task_id=task_id, current_user=current_user)
     if not db_task:
         raise HTTPException(status_code=404, detail="Task not found")
-    return None
+    return crud.delete_task(task_id=task_id, db=db, current_user=current_user)
 
 
