@@ -4,7 +4,7 @@
 
     <form @submit.prevent="createTask">
       <input v-model="newTask.title" placeholder="Название задачи" required />
-      <input v-model="newDescription.description" placeholder="Описание (необязательно)" />
+      <textarea v-model="newTask.description" placeholder="Описание (необязательно)"></textarea> 
       <button type="submit">Создать</button>
     </form>
 
@@ -13,7 +13,7 @@
 
         <!-- Текст задачи -->
         <span :style="{ textDecoration: task.completed ? 'line-through' : 'none' }">
-          <strong>{{ task.title }}</strong>
+          <strong>{{ task.title }}</strong><br/>
           <p v-if="task.description">{{ task.description }}</p>
         </span>
 
@@ -41,8 +41,10 @@ export default {
   data() {
     return {
       tasks: [],
-      newTask: "",
-      newDescription: ""
+      newTask: {
+        title: "",
+        description: ""
+      }
     };
   },
   async mounted() {
@@ -68,12 +70,16 @@ export default {
         const token = localStorage.getItem("token");
         const res = await axios.post(
           "http://127.0.0.1:8000/tasks",
-          { title: this.newTask, description: this.newDescription },
+          { 
+            title: this.newTask.title, 
+            description: this.newTask.description || null
+          },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.tasks.push(res.data);
-        this.newTask = "";
-        this.newDescription = "";
+        this.newTask.title = "";
+        this.newTask.description = "";
+        await this.getTasks();
       } catch {
         alert("Не удалось создать задачу");
       }
@@ -92,7 +98,7 @@ export default {
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        task.is_done = res.data.is_done;
+        task.completed = res.data.completed;
       } catch {
         alert("Ошибка при обновлении задачи");
       }

@@ -48,7 +48,7 @@ async def read_one_task(
 #UPDATE
 @router.put("/{task_id}", response_model=schemas.TaskResponse)
 async def update_task(
-    task_id: str,
+    task_id: int,
     task_update: schemas.TaskUpdate,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
