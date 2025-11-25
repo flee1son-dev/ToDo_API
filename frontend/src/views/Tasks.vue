@@ -1,5 +1,7 @@
 <template>
   <div>
+    <TasksHeader />
+
     <h1>Мои задачи</h1>
 
     <form @submit.prevent="createTask">
@@ -11,20 +13,17 @@
     <ul>
       <li v-for="task in tasks" :key="task.id">
 
-        <!-- Текст задачи -->
         <span :style="{ textDecoration: task.completed ? 'line-through' : 'none' }">
           <strong>{{ task.title }}</strong><br/>
           <p v-if="task.description">{{ task.description }}</p>
         </span>
 
-        <!-- Галочка -->
         <input
           type="checkbox"
           :checked="task.completed"
           @change="toggleDone(task)"
         />
 
-        <!-- Крестик удалить -->
         <button @click="deleteTask(task.id)" style="margin-left: 10px; color: red;">
           ✖
         </button>
@@ -35,9 +34,11 @@
 
 <script>
 import axios from "axios";
+import TasksHeader from "./TasksHeader.vue";
 
 export default {
   name: "TasksPage",
+  components: { TasksHeader },
   data() {
     return {
       tasks: [],
@@ -51,7 +52,6 @@ export default {
     await this.getTasks();
   },
   methods: {
-    // Получить задачи
     async getTasks() {
       try {
         const token = localStorage.getItem("token");
@@ -64,7 +64,6 @@ export default {
       }
     },
 
-    // Создать задачу
     async createTask() {
       try {
         const token = localStorage.getItem("token");
@@ -85,7 +84,6 @@ export default {
       }
     },
 
-    // Отметить как выполненную
     async toggleDone(task) {
       try {
         const token = localStorage.getItem("token");
@@ -104,7 +102,7 @@ export default {
       }
     },
 
-    // Удалить задачу
+    
     async deleteTask(id) {
       if (!confirm("Удалить задачу?")) return;
 
@@ -121,3 +119,30 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+form {
+  margin: 15px 0;
+}
+
+input, textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+</style>

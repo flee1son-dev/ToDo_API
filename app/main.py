@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from starlette.staticfiles import StaticFiles
 
 from app.database import engine, SessionLocal, Base
-from app.routers import users, auth, tasks
+from app.routers import profile, auth, tasks
 
 
 app = FastAPI()
@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(users.router)
+app.include_router(profile.router)
 app.include_router(tasks.router)
 app.include_router(auth.router)
 

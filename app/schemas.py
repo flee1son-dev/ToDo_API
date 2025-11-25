@@ -37,7 +37,11 @@ class UserUpdate(BaseModel):
 
 class TaskBase(BaseModel):
     title: str = Field(..., description="Title of the task")
+<<<<<<< HEAD
     description: str | None = Field(default=None, description="Description of the task")
+=======
+    description: str | None = Field(None, description="Description of the task")
+>>>>>>> feature_branch
     completed: bool = Field(default=False, description='Status task')
 
 
