@@ -62,6 +62,10 @@ export default {
     async updateProfile() {
       const token = localStorage.getItem("token");
 
+      const payload = { ...this.user };
+
+      if (!payload.password) delete payload.password
+
       await axios.put(
         "http://127.0.0.1:8000/profile/update",
         this.user,

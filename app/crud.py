@@ -43,8 +43,11 @@ def update_user(
         raise HTTPException(status_code=404, detail="User not found")
     update_data = user_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
-        if key == "password" and value:
-            value = hash_password(value)
+        if key == "password":
+            if value:
+                value = hash_password(value)
+            else:
+                continue
         setattr(db_user, key, value)
     db.commit()
     db.refresh(db_user)
