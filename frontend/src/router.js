@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginPage from "./views/Login.vue";
 import RegisterPage from "./views/Register.vue";
 import TasksPage from "./views/Tasks.vue";
+import ProfilePage from "./views/ProfilePage.vue"
 
 const routes = [
   {
@@ -23,6 +24,11 @@ const routes = [
     path: "/tasks",
     name: "Tasks",
     component: TasksPage
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: ProfilePage
   }
 ];
 

@@ -1,30 +1,29 @@
 <template>
   <div>
+    <TasksHeader />
+
     <h1>Мои задачи</h1>
 
     <form @submit.prevent="createTask">
       <input v-model="newTask.title" placeholder="Название задачи" required />
-      <input v-model="newDescription.description" placeholder="Описание (необязательно)" />
+      <textarea v-model="newTask.description" placeholder="Описание (необязательно)"></textarea> 
       <button type="submit">Создать</button>
     </form>
 
     <ul>
       <li v-for="task in tasks" :key="task.id">
 
-        <!-- Текст задачи -->
         <span :style="{ textDecoration: task.completed ? 'line-through' : 'none' }">
-          <strong>{{ task.title }}</strong>
+          <strong>{{ task.title }}</strong><br/>
           <p v-if="task.description">{{ task.description }}</p>
         </span>
 
-        <!-- Галочка -->
         <input
           type="checkbox"
           :checked="task.completed"
           @change="toggleDone(task)"
         />
 
-        <!-- Крестик удалить -->
         <button @click="deleteTask(task.id)" style="margin-left: 10px; color: red;">
           ✖
         </button>
@@ -35,21 +34,24 @@
 
 <script>
 import axios from "axios";
+import TasksHeader from "./TasksHeader.vue";
 
 export default {
   name: "TasksPage",
+  components: { TasksHeader },
   data() {
     return {
       tasks: [],
-      newTask: "",
-      newDescription: ""
+      newTask: {
+        title: "",
+        description: ""
+      }
     };
   },
   async mounted() {
     await this.getTasks();
   },
   methods: {
-    // Получить задачи
     async getTasks() {
       try {
         const token = localStorage.getItem("token");
@@ -62,24 +64,26 @@ export default {
       }
     },
 
-    // Создать задачу
     async createTask() {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
           "http://127.0.0.1:8000/tasks",
-          { title: this.newTask, description: this.newDescription },
+          { 
+            title: this.newTask.title, 
+            description: this.newTask.description || null
+          },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         this.tasks.push(res.data);
-        this.newTask = "";
-        this.newDescription = "";
+        this.newTask.title = "";
+        this.newTask.description = "";
+        await this.getTasks();
       } catch {
         alert("Не удалось создать задачу");
       }
     },
 
-    // Отметить как выполненную
     async toggleDone(task) {
       try {
         const token = localStorage.getItem("token");
@@ -92,13 +96,13 @@ export default {
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        task.is_done = res.data.is_done;
+        task.completed = res.data.completed;
       } catch {
         alert("Ошибка при обновлении задачи");
       }
     },
 
-    // Удалить задачу
+    
     async deleteTask(id) {
       if (!confirm("Удалить задачу?")) return;
 
@@ -115,3 +119,30 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+form {
+  margin: 15px 0;
+}
+
+input, textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+</style>

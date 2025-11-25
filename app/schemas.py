@@ -37,7 +37,7 @@ class UserUpdate(BaseModel):
 
 class TaskBase(BaseModel):
     title: str = Field(..., description="Title of the task")
-    description: str = Field(None, description="Description of the task")
+    description: str | None = Field(None, description="Description of the task")
     completed: bool = Field(default=False, description='Status task')
 
 
